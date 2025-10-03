@@ -1,0 +1,54 @@
+# Raw HTML
+
+<EpicVideo url="https://www.epicai.pro/workshops/day-5-6-mcp-ui/raw-html~nf6c7" />
+
+👨‍💼 When users ask our AI assistant about specific tags or categories, they expect to see that information presented clearly and visually, not just as a wall of text. Think about it - when someone asks "What is the 'javascript' tag about?" they want to see a nicely formatted card with the tag name prominently displayed and a clear description, not just raw text that says "javascript: A programming language for web development."
+
+The problem is that our current system only returns plain text responses, which makes it harder for users to quickly scan and understand the information. Users have to read through paragraphs of text to find what they're looking for, and important details can get lost in the noise.
+
+To solve this, we need to transform our text-based responses into rich, visual interfaces that users can quickly scan and understand. This is where MCP UI comes in - it allows us to send HTML content that gets rendered as actual visual components instead of plain text.
+
+Here's the example of a weather card again:
+
+```ts
+import { createUIResource } from '@mcp-ui/server'
+
+// Create a UI resource with raw HTML
+const resource = createUIResource({
+	uri: 'ui://weather-card/lagos-nigeria',
+	content: {
+		type: 'rawHtml',
+		htmlString: `
+			<div style="padding: 20px; border: 1px solid #ccc; border-radius: 8px; background: linear-gradient(135deg, #74b9ff, #0984e3); color: white;">
+				<h1>Lagos, Nigeria</h1>
+				<p>85°F - Partly Cloudy</p>
+				<p>Humidity: 78% | Wind: 12 mph</p>
+			</div>
+		`,
+	},
+	encoding: 'text',
+})
+```
+
+The key difference is that instead of returning plain text content, we're returning a UI resource that clients can render as an actual visual component. This transforms the user experience from reading text descriptions to interacting with rich, visual interfaces.
+
+<callout-info>
+	The `createUIResource` function packages your HTML content into a format that
+	MCP clients can understand and render. The `uri` parameter creates a unique
+	identifier for your UI resource, while the `content` specifies what type of UI
+	you're providing.
+</callout-info>
+
+When there's no tag found, we should also provide a clear visual indication rather than just text:
+
+<callout-info>
+	The styling in these examples uses inline CSS for simplicity, but you can use
+	any valid HTML markup. Consider using CSS classes or even external stylesheets
+	for more complex designs.
+</callout-info>
+
+The goal is to make tag information feel immediate and scannable for users, so they can quickly understand what each tag represents without having to parse through walls of text.
+
+Now, let's implement this visual transformation by updating the `get_tag` tool to return a UI resource instead of plain text.
+
+- 📜 [MCP UI Server Documentation](https://mcpui.dev/guide/server/typescript/usage-examples#metadata-configuration-examples).

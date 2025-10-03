@@ -1,0 +1,18 @@
+# Sizing
+
+<EpicVideo url="https://www.epicai.pro/workshops/day-5-6-mcp-ui/sizing-v9100" />
+
+👨‍💼 When users view their journal entries, they expect the interface to be sized appropriately for comfortable reading. A cramped window makes it hard to read entries, while an oversized frame wastes screen space.
+
+Add `uiMetadata` with `preferred-frame-size` to specify the ideal dimensions for the journal viewer:
+
+```ts
+uiMetadata: {
+	// width and height in pixels
+  'preferred-frame-size': ['400px', '600px'],
+}
+```
+
+The `preferred-frame-size` key accepts an array with width and height values. The UI system will try to respect your preferred size based on available screen space.
+
+Now, add the `uiMetadata` to make the journal viewer shine.

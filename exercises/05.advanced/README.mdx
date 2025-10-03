@@ -1,0 +1,105 @@
+# Advanced
+
+<EpicVideo url="https://www.epicai.pro/workshops/day-5-6-mcp-ui/intro-to-advanced-u3kkh" />
+
+We're going to cover two advanced features of MCP UI that make it more powerful.
+
+```mermaid
+sequenceDiagram
+    participant User
+    participant Iframe
+    participant App
+    participant MCP as MCP Server
+
+    Note over User,MCP: Tool Results Flow
+    User->>Iframe: Interact with UI (e.g., delete entry)
+    Iframe->>App: Send tool message via postMessage
+    App->>MCP: Call tool with structured output schema
+    MCP->>MCP: Process request
+    MCP->>App: Return structured result (success/failure)
+    App->>Iframe: Send result via postMessage
+    Iframe->>Iframe: Validate with Zod schema
+    Iframe->>User: Update UI based on result
+
+    Note over User,MCP: Render Data Flow
+    User->>App: Request UI resource
+    App->>MCP: Get UI resource with initial data
+    MCP->>App: Return resource with uiMetadata containing render data
+    App->>Iframe: Create iframe with resource
+    Iframe->>App: Emit ui-lifecycle-iframe-ready event
+    App->>Iframe: Send ui-lifecycle-iframe-render-data event
+    Iframe->>Iframe: Process initial data
+    Iframe->>User: Display content with pre-loaded data
+```
+
+## Tool Results
+
+When we call tools, we get the result of the tool call and because we have structured content, we can use it programmatically. This enables rich integrations where the client can understand and act on tool results.
+
+Example:
+
+```ts
+// Tool returns both human-readable and structured data
+const result = await sendMcpMessage(
+	'tool',
+	{
+		toolName: 'analyze_code',
+		params: { filePath: 'src/utils/validation.ts' },
+	},
+	{ schema: codeAnalysisSchema },
+)
+
+// Client can access structured data
+const { metrics, suggestions, complexity } = result.structuredContent
+if (complexity > 10) {
+	showRefactorWarning(suggestions)
+}
+updateCodeMetrics(metrics)
+```
+
+<callout-info>
+	With structured content, MCP clients can build sophisticated workflows where
+	tools can trigger automatic actions based on their results, rather than
+	requiring manual user intervention for every step.
+</callout-info>
+
+The structured content is defined by the tool's `outputSchema` and validated using Zod schemas on the client side, ensuring type safety and reliable data flow between the MCP server and client applications.
+
+Note, keep in mind the example above uses our `sendMcpMessage` utility function which is really just a wrapper around the `postMessage` API with the messageId and waiting for the response handled for us.
+
+## Render Data
+
+MCP UI resources can pass initial data directly to iframe components, eliminating the need for additional API calls or complex data fetching logic. This is especially great if the MCP server is running behind authentication and you want to pass private data into the iframe for display. This **render data** pattern allows the server to provide all necessary context when creating UI resources.
+
+Example:
+
+```ts
+// Server provides initial data with the UI resource
+return {
+	content: [
+		{
+			type: 'resource',
+			resource: {
+				uri: iframeUrl.toString(),
+				mimeType: 'text/html',
+				uiMetadata: {
+					'initial-render-data': { bedInventory },
+				},
+			},
+		},
+	],
+}
+
+// Client receives data as soon as it emits the `ui-lifecycle-iframe-ready` event
+window.addEventListener('message', function handleMessage(event: MessageEvent) {
+	if (event.data?.type !== 'ui-lifecycle-iframe-render-data') return
+	if (event.data.error) {
+		// event.data.error... handle it
+	} else {
+		const { bedInventory } = event.data.payload
+		// do stuff with this
+	}
+})
+```
+
+📜 [Passing Render Data to the iframe](https://mcpui.dev/guide/embeddable-ui#passing-render-data-to-the-iframe)

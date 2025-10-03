@@ -1,0 +1,12 @@
+# Send Prompts
+
+<EpicVideo url="https://www.epicai.pro/workshops/day-5-6-mcp-ui/prompts-m0qlk/solution" />
+
+👨‍💼 Big win here. Users can now hit "Summarize" and immediately get a concise, insightful take on the entry they're viewing. This closes the loop between curiosity and clarity: they ask, the system interprets, and the answer shows up without disrupting their flow.
+
+Under the hood, we wired the iframe to send a `prompt` message through our MCP bridge and handle the response cleanly:
+
+- **New capability**: `sendMcpMessage('prompt', { prompt })` so components can request AI assistance directly.
+- **UX benefit**: No reloads, no context loss. The UI stays responsive while the request is in flight.
+
+This turns "Summarize" from a promise into a dependable action. Users now trust that our UI can ask the right question and deliver the right kind of answer at the right moment.
