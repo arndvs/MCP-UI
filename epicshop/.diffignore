@@ -1,4 +1,0 @@
-worker-configuration.d.ts
-**/test/**
-vitest.config.ts
-wrangler.jsonc
